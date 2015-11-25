@@ -30,34 +30,35 @@ var demo = function () {
 
   var fnTransform = function (s){
     k++
-    return function (chunk, enc, cb) {
+    return function (chunk, enc, cb) {                // For each chunk
       var that = this;
-      if(touts[s] && touts[s].length>=rate) {               // rate exceeded
+      if(touts[s] && touts[s].length>=rate) {         // If the rate exceed
         if(!pend[s]) pend[s] = []
-        pend[s].push(function () {                          // store a function to pend the process
-          doSomeLongProcess(chunk, s, function () {
-            if(pend[s].length) pend[s].shift()();           // takes first pend process, run it
-            that.push(chunk)                                // push the data down
+        pend[s].push(function () {                    // Store a function to pend the process
+          doSomeLongProcess(chunk, s, function () {   // that is slow.
+            if(pend[s].length) pend[s].shift()();     // Takes first pend process, run it,
+            that.push(chunk)                          // push the data down.
           });
-          cb(null);                                         // pull new one, as this process is queued
+          cb(null);                                   // Pull new one, as this process is queued
         })
-      } else {
-        doSomeLongProcess(chunk, s, function () {
-          if(pend[s] && pend[s].length) pend[s].shift()();  // takes first pend process, run it
-          that.push(chunk)                                  // push the data down
+      } else {                                        // Else
+        doSomeLongProcess(chunk, s, function () {     // Run a slow process, immediately.
+          if(pend[s] && pend[s].length)
+            pend[s].shift()();                        // Takes first pend process, run it,
+          that.push(chunk)                            // push the data down.
         });
-        cb(null);                                           // it pools immediately
+        cb(null);                                     // Pull new item immediately
       }
     };
   };
-  var fnFlush = function (s){                               // flush must not end before the transform !!
+  var fnFlush = function (s){                         // Note: Flush must not end before the transform !!
     return function (cb) {
-      var waitForThemToFinish = function () {
+      var waitForThemToFinish = function () {         // it must wait for the end of the jobs. It could also abort.
         if(!touts[s]) cb();
-        else if(!touts[s].length) cb()
-        else setTimeout(waitForThemToFinish, 10);           // re-call until all process has ended
+        else if(!touts[s].length) cb()                // continue the flush if pend process is empty.
+        else setTimeout(waitForThemToFinish, 10);     // re-call until all process has ended.
       };
-      waitForThemToFinish();                                // flush is called once, normally, i guess.
+      waitForThemToFinish();                          // Enter a wait loop. Note: flush is called once, normally, i guess.
     };
   };
   var fnEnd = function (s){
