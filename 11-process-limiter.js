@@ -5,6 +5,10 @@
   the streams receives lots of data,
   but process at constant rate.
 
+  Run it to visualize the results with multimeter process bars.
+
+  Then play with it to see how the behavior can be changed.
+
 
  */
 
