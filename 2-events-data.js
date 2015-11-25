@@ -18,9 +18,9 @@
 
 var demo = function () {
   // create a new stream instance
-  var streamA = through2();
-  var streamB = through2();
-  var streamC = through2();
+  var streamA = through2(function(chunk,enc,cb){debug('streamA > %s', chunk);cb(null, 'streamA-'+chunk)});
+  var streamB = through2(function(chunk,enc,cb){debug('streamB > %s', chunk);cb(null, 'streamB-'+chunk)});
+  var streamC = through2(function(chunk,enc,cb){debug('streamC > %s', chunk);cb(null, 'streamC-'+chunk)});
 
   streamA.on('data', function (d) {
     debug("streamA received : %s", d)

@@ -1,12 +1,9 @@
 
 /*
-  Demonstrate [pull then push] effect on the stream
-    to compare with 8-push-then-pull
+ Demonstrate process limiting
 
-  This time let s use some progress to visualize the resulting behavior.
-
-  You know what ? Play with it yourself.
-  I admit i still need to figure out few things....
+  the streams receives lots of data,
+  but process at constant rate.
 
 
  */
@@ -16,36 +13,51 @@ var demo = function () {
   var meter = new StreamMeter();
   meter.start();
 
-  var width = 90;
-  var len = 10;
-  var touts = {};
-  var k = 1;
+  var len     = 50;
+  var width   = 90;
+  var touts   = {};
+  var pend    = {};
+  var k       = 1;
+  var rate    = 2;
+
   var doSomeLongProcess = function (i, s, then) {
     if(!touts[s]) touts[s] = []
     touts[s].push(setTimeout(function(){
       touts[s].shift()
       then();
-    }, (k===2?2:getRandomArbitrary(100*k, 1000) + i *250)) );
+    }, getRandomArbitrary(100*k, 1000+100*k)) );
   };
+
   var fnTransform = function (s){
     k++
     return function (chunk, enc, cb) {
       var that = this;
-      doSomeLongProcess(chunk, s, function () {
-        that.push(chunk)
-        //cb(null, chunk);
-      });
-      cb(null);
+      if(touts[s] && touts[s].length>=rate) {               // rate exceeded
+        if(!pend[s]) pend[s] = []
+        pend[s].push(function () {                          // store a function to pend the process
+          doSomeLongProcess(chunk, s, function () {
+            if(pend[s].length) pend[s].shift()();           // takes first pend process, run it
+            that.push(chunk)                                // push the data down
+          });
+          cb(null);                                         // pull new one, as this process is queued
+        })
+      } else {
+        doSomeLongProcess(chunk, s, function () {
+          if(pend[s] && pend[s].length) pend[s].shift()();  // takes first pend process, run it
+          that.push(chunk)                                  // push the data down
+        });
+        cb(null);                                           // it pools immediately
+      }
     };
   };
-  var fnFlush = function (s){
+  var fnFlush = function (s){                               // flush must not end before the transform !!
     return function (cb) {
       var waitForThemToFinish = function () {
         if(!touts[s]) cb();
         else if(!touts[s].length) cb()
-        else setTimeout(waitForThemToFinish, 10);
+        else setTimeout(waitForThemToFinish, 10);           // re-call until all process has ended
       };
-      waitForThemToFinish();
+      waitForThemToFinish();                                // flush is called once, normally, i guess.
     };
   };
   var fnEnd = function (s){
@@ -89,6 +101,7 @@ var demo = function () {
   fnProgress(streamA, 'streamA')
   fnProgress(streamB, 'streamB')
   fnProgress(streamC, 'streamC')
+
 
   streamC.on('end', function () {
     setTimeout(function (){

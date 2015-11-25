@@ -26,7 +26,7 @@ Clone the repo, then run the script, modify them, study ect. whatever.
 ```sh
 git clone git@github.com:maboiteaspam/working-with-streams.git
 cd working-with-streams
-node 10*
+node 10* --verbose
 ```
 
 ## Notes
