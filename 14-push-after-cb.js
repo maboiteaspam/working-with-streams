@@ -14,6 +14,8 @@
 
     `cb(err,chunk)` must not be called after any `stream.push(chunk)` !
 
+    `cb(err)` or, it must not pass the chunk !
+
  */
 var demo = function () {
 
