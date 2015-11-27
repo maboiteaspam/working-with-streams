@@ -16,16 +16,18 @@ var demo = function () {
   var meter = new StreamMeter();
   meter.start();
 
-  var width = 90;
-  var len = 10;
+  var len = 500;
   var touts = {};
+  var finished = {};
   var k = 1;
   var doSomeLongProcess = function (i, s, then) {
     if(!touts[s]) touts[s] = []
+    if(!finished[s]) finished[s] = 0
     touts[s].push(setTimeout(function(){
       touts[s].shift()
+      finished[s]++
       then();
-    }, (k===2?2:getRandomArbitrary(100*k, 1000) + i *250)) );
+    }, getRandomArbitrary(500*k, 500*k*2) +i*100) );
   };
   var fnTransform = function (s){
     k++
@@ -60,12 +62,11 @@ var demo = function () {
     });
     var currentBar = meter.add(s+' length       ');
     stream.on('data', function () {
-      currentBar.percent(touts[s].length/width*100, touts[s].length+'');
+      currentBar.percent(touts[s].length/len*100, touts[s].length+'');
     });
     var doneBar = meter.add(s+' done         ');
     stream.on('data', function () {
-      var done = receivedBar.progress-touts[s].length;
-      done = done<0?0:done;
+      var done = finished[s] || 0;
       doneBar.percent(done/len*100, done+'');
     });
   };

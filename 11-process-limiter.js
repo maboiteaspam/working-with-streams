@@ -17,17 +17,19 @@ var demo = function () {
   var meter = new StreamMeter();
   meter.start();
 
-  var len     = 50;
-  var width   = 90;
+  var len     = 500;
   var touts   = {};
   var pend    = {};
+  var finished = {};
   var k       = 1;
-  var rate    = 2;
+  var rate    = 50;
 
   var doSomeLongProcess = function (i, s, then) {
     if(!touts[s]) touts[s] = []
+    if(!finished[s]) finished[s] = 0
     touts[s].push(setTimeout(function(){
       touts[s].shift()
+      finished[s]++;
       then();
     }, getRandomArbitrary(100*k, 1000+100*k)) );
   };
@@ -71,18 +73,13 @@ var demo = function () {
   };
   var fnProgress = function (stream, s){
     var receivedBar = meter.add(s+' received     ');
+    var currentBar = meter.add(s+' length       ');
+    var doneBar = meter.add(s+' done         ');
     stream.on('data', function () {
       receivedBar.progress++;
       receivedBar.percent(receivedBar.progress/len*100, receivedBar.progress+'');
-    });
-    var currentBar = meter.add(s+' length       ');
-    stream.on('data', function () {
-      currentBar.percent(touts[s].length/width*100, touts[s].length+'');
-    });
-    var doneBar = meter.add(s+' done         ');
-    stream.on('data', function () {
-      var done = receivedBar.progress-touts[s].length;
-      done = done<0?0:done;
+      currentBar.percent(touts[s].length/len*100, touts[s].length+'');
+      var done = finished[s];
       doneBar.percent(done/len*100, done+'');
     });
   };
