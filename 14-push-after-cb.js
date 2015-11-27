@@ -1,17 +1,18 @@
 
 /*
- Demonstrate the "Error: no writecb in Transform class"
+ Demonstrate the error that triggers
+ when `stream.push(chunk)` is called after `cb(err, chunk)`
 
-  Which means : you called cb(err,chunk) twice within the same transform operation !
+  Symptom is
+
+     throw er; // Unhandled 'error' event
+     ^
+     Error: stream.push() after EOF
 
 
- The solution is simple, fix the code.
+  The solution is simple, fix the code.
 
-  `cb(err, chunk)` must be called only once !
-
-  `cb(err, chunk)` must not be called after any `stream.push(chunk)` !
-
- `cb(err)` or, it must not pass the chunk !
+    `cb(err,chunk)` must not be called after any `stream.push(chunk)` !
 
  */
 var demo = function () {
@@ -21,8 +22,8 @@ var demo = function () {
   var fnTransform = function (s){
     return function (chunk, enc, cb) {
       debug('%s', chunk)
-      cb(null, chunk);
-      cb(null, chunk);      // nop, that is not ok.
+      cb(null);
+      this.push(chunk)    // nop that is not ok !
     };
   };
   var fnFlush = function (s){

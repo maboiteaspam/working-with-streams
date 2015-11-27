@@ -1,28 +1,20 @@
 
 /*
- Demonstrate the "Error: no writecb in Transform class"
-
-  Which means : you called cb(err,chunk) twice within the same transform operation !
-
-
- The solution is simple, fix the code.
-
-  `cb(err, chunk)` must be called only once !
-
-  `cb(err, chunk)` must not be called after any `stream.push(chunk)` !
-
- `cb(err)` or, it must not pass the chunk !
+ Demonstrate the effect of pushing multiple times
+ before calling `cb(err,chunk)`
 
  */
 var demo = function () {
 
-  var len     = 50000;
+  var len     = 500;
 
   var fnTransform = function (s){
     return function (chunk, enc, cb) {
-      debug('%s', chunk)
-      cb(null, chunk);
-      cb(null, chunk);      // nop, that is not ok.
+      debug('%s %s', s, chunk)
+      this.push(chunk)    // that is ok
+      this.push(chunk)    // that is ok
+      this.push(chunk)    // that is ok
+      cb(null);
     };
   };
   var fnFlush = function (s){
@@ -32,6 +24,9 @@ var demo = function () {
     };
   };
   var streamA = through2(fnTransform('streamA'), fnFlush('streamA'));
+  var streamB = through2(fnTransform('streamB'), fnFlush('streamB'));
+
+  streamA.pipe(streamB)
 
   for(var i=0;i<len;i++){
     streamA.write(''+i);
@@ -39,6 +34,7 @@ var demo = function () {
 
   streamA.end();
   streamA.resume();
+  streamB.resume();
 };
 
 // boiler plate stuff for the demo
