@@ -29,6 +29,13 @@ cd working-with-streams
 node 10* --verbose
 ```
 
+## Read more
+
+ - https://github.com/rvagg/through2
+ - https://github.com/nodejs/readable-stream/blob/master/doc/stream.markdown#stream_event_data
+ - https://github.com/substack/stream-handbook
+
+
 ## Notes
 
 Happy streaming ~!
