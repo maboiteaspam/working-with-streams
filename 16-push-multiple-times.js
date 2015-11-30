@@ -1,7 +1,7 @@
 
 /*
  Demonstrate the effect of pushing multiple times
- before calling `cb(err,chunk)`
+ before calling `cb(err)`
 
  */
 var demo = function () {
