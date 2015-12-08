@@ -26,7 +26,7 @@ For a quick introduction about stream, check https://streams.spec.whatwg.org/#in
 ```js
 var source = through2();                        // Source stream,
                                                 // is the stream data are written to,
-                                                // and transforms are piped to.
+                                                // and transforms are piped in.
 
 var fnTransform = function (chunk, enc, cb) {   // Transform function,
     cb(null, {chunk: 'transformed'})            // bound to a stream,
