@@ -38,6 +38,11 @@ var sink = through2();                          // Sink stream, ends the chain o
 
 source.pipe(transform).pipe(sink);              // Chained streams, like a recipe to cook flowed data.
 
+source.write({                                  // Now, write data in the stream,
+    your: 'first chunk'                         // Let it transform and pass the data
+});                                             // to the sink.
+
+
 source.on('data', function (data){              // each stream (source, transform, sink)
     console.log(data);                          // emits their its own data event.
 });
@@ -45,11 +50,6 @@ source.on('data', function (data){              // each stream (source, transfor
 sink.on('error', function (err){                // each stream (source, transform, sink)
     console.error(err);                         // emits their its own data event.
 });
-
-source.write({                                  // Now, write data in the stream,
-    your: 'first chunk'                         // Let is transform and pass the data
-});                                             // to the sink.
-
 ```
 
 ## examples
