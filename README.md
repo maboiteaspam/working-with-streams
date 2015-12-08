@@ -12,6 +12,46 @@ Your warmly welcome to fix me when i did some weird stuff !!
 
 All examples are based on `rvagg/through2` module, as it helps to create streams and transforms in a glance.
 
+## stuff to read
+
+For a quick introduction about stream, check https://streams.spec.whatwg.org/#intro
+
+ - https://github.com/whatwg/streams
+ - https://github.com/rvagg/through2
+ - https://github.com/nodejs/readable-stream/blob/master/doc/stream.markdown#stream_event_data
+ - https://github.com/substack/stream-handbook
+
+## The short introduction
+
+```js
+var source = through2();                        // Source stream,
+                                                // is the stream data are written to,
+                                                // and transforms are piped to.
+
+var fnTransform = function (chunk, enc, cb) {   // Transform function,
+    cb(null, {chunk: 'transformed'})            // bound to a stream,
+};                                              // it transforms data as they come.
+
+var transform = through2(fnTransform);          // That is a stream-transform.
+
+var sink = through2();                          // Sink stream, ends the chain of stream.
+
+source.pipe(transform).pipe(sink);              // Chained streams, like a recipe to cook flowed data.
+
+source.on('data', function (data){              // each stream (source, transform, sink)
+    console.log(data);                          // emits their its own data event.
+});
+
+sink.on('error', function (err){                // each stream (source, transform, sink)
+    console.error(err);                         // emits their its own data event.
+});
+
+source.write({                                  // Now, write data in the stream,
+    your: 'first chunk'                         // Let is transform and pass the data
+});                                             // to the sink.
+
+```
+
 ## examples
 
 I have put down 10 examples so far.
@@ -28,13 +68,6 @@ git clone git@github.com:maboiteaspam/working-with-streams.git
 cd working-with-streams
 node 10* --verbose
 ```
-
-## Read more
-
- - https://github.com/rvagg/through2
- - https://github.com/nodejs/readable-stream/blob/master/doc/stream.markdown#stream_event_data
- - https://github.com/substack/stream-handbook
-
 
 ## Notes
 
