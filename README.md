@@ -44,11 +44,11 @@ source.write({                                  // Now, write data in the stream
 
 
 source.on('data', function (data){              // each stream (source, transform, sink)
-    console.log(data);                          // emits their its own data event.
+    console.log(data);                          // emits its own data event.
 });
 
 sink.on('error', function (err){                // each stream (source, transform, sink)
-    console.error(err);                         // emits their its own data event.
+    console.error(err);                         // emits its own data event.
 });
 ```
 
