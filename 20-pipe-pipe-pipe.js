@@ -19,8 +19,9 @@ var demo = function () {
 
   setTimeout(function () {
 
-    console.log('')
-    console.log('')
+    console.log(' ');
+    console.log(' ');
+    console.log('one more time');
     var A = cStream('A1');
     var B = cStream('B1');
     var C = cStream('C1');
@@ -38,9 +39,9 @@ var demo = function () {
 
     setTimeout(function () {
 
-      console.log('')
-      console.log('one more time')
-      console.log('')
+      console.log(' ');
+      console.log(' ');
+      console.log('one more time');
       var A = cStream('A2');
       var B = cStream('B2');
       var C = cStream('C2');
