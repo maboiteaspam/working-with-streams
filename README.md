@@ -21,6 +21,11 @@ For a quick introduction about stream, check https://streams.spec.whatwg.org/#in
  - https://github.com/nodejs/readable-stream/blob/master/doc/stream.markdown#stream_event_data
  - https://github.com/substack/stream-handbook
 
+I do a second list more speifically about readable-stream
+ - https://github.com/calvinmetcalf/streams-a-love-story
+ - https://github.com/calvinmetcalf/noms
+ - https://github.com/nodejs/readable-stream
+
 ## The short introduction
 
 ```js
